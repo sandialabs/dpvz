@@ -925,3 +925,22 @@ void zerr(const char* file, int line, int err)
 	fprintf(stderr, "%s: %4d: err=%d\n", file, line, err);
     }
 }
+
+#if ! defined(HAVE_MEMRCHR)
+/****************************************************************************/
+void *memrchr(const void *s, int c, size_t n)
+/****************************************************************************/
+/*                                                                          */
+/****************************************************************************/
+{
+    const unsigned char *cp;
+    if (n != 0) {
+        cp = (unsigned char *)s + n;
+        do {
+            if (*(--cp) == (unsigned char)c) return (void *)cp;
+        } while (--n != 0);
+    }
+    return NULL;
+}
+
+#endif

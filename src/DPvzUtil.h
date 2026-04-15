@@ -62,4 +62,8 @@ int         deflate_buf(void* tgt_buf, int tgt_max, const void* src_buf, int src
 int         inflate_buf(void* tgt_buf, int tgt_max, const void* src_buf, int src_len);
 void        zerr(const char* file, int line, int err);
 
+#if ! defined(HAVE_MEMRCHR)
+void *memrchr(const void *s, int c, size_t n);
+#endif
+
 #endif

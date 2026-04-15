@@ -15,6 +15,9 @@ include(GNUInstallDirs)
 # create compile_commands.json
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+include(CheckFunctionExists)
+check_function_exists(memrchr, HAVE_MEMRCHR)
+
 # set default toggles
 option(DPVZ_MPI ON)
 option(DPVZ_SERIAL OFF)
