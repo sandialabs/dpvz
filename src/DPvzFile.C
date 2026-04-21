@@ -251,7 +251,7 @@ fprintf(stdout, "%s: %4d: DPvzFile: r=%d: file_name='%s'\n", name_only(__FILE__)
 	}
 
 #if defined(DPvzTrace)
-fprintf(stdout, "%s: %4d: DPvzFile: r=%d: creating metadata, g_sz=%ld, majik='%s'\n", name_only(__FILE__), __LINE__, rank, g_sz, majik.c_str());
+fprintf(stdout, "%s: %4d: DPvzFile: r=%d: creating metadata, g_sz=%llu, majik='%s'\n", name_only(__FILE__), __LINE__, rank, g_sz, majik.c_str());
 #endif
 
 	// create, initialize, and write the structure to the file
@@ -309,9 +309,9 @@ fprintf(stdout, "%s: %4d: DPvzFile: r=%d: closing file descriptor %d, file_name=
 	meta = NULL;
       } else {
 	if (0 < g_sz && majik.c_str() != NULL) {
-	  fprintf(stderr, "%s: %4d: DPvzFile: attempt to create a new file with bad global size (%ld) and no majik string, file='%s'\n", name_only(__FILE__), __LINE__, g_sz, file_name.c_str());
+	  fprintf(stderr, "%s: %4d: DPvzFile: attempt to create a new file with bad global size (%llu) and no majik string, file='%s'\n", name_only(__FILE__), __LINE__, g_sz, file_name.c_str());
 	} else if (0 < g_sz) {
-	  fprintf(stderr, "%s: %4d: DPvzFile: attempt to create a new file with bad global size (%ld), file='%s'\n", name_only(__FILE__), __LINE__, g_sz, file_name.c_str());
+	  fprintf(stderr, "%s: %4d: DPvzFile: attempt to create a new file with bad global size (%llu), file='%s'\n", name_only(__FILE__), __LINE__, g_sz, file_name.c_str());
 	} else if (majik.c_str() != NULL) {
 	  fprintf(stderr, "%s: %4d: DPvzFile: attempt to create a new file with no majik string, file='%s'\n", name_only(__FILE__), __LINE__, file_name.c_str());
 	}
@@ -536,7 +536,7 @@ DPvzFile::DPvzFile(std::string name, DPvzMode m, uint64_t g_sz, std::string maji
 /****************************************************************************/
 {
 #if defined(DPvzTrace)
-fprintf(stdout, "%s: %4d: DPvzFile: entering, g_sz=%ld, majik='%s'\n", name_only(__FILE__), __LINE__, g_sz, majik.c_str());
+fprintf(stdout, "%s: %4d: DPvzFile: entering, g_sz=%llu, majik='%s'\n", name_only(__FILE__), __LINE__, g_sz, majik.c_str());
 #endif
 
   mode = m;
@@ -546,11 +546,12 @@ fprintf(stdout, "%s: %4d: DPvzFile: entering, g_sz=%ld, majik='%s'\n", name_only
   // find the name of the file to be opened
   if (0 < ext.size()) {
     // if name ends with ext, use the name as it stands
-    char cext[ext.size()+2];
-    sprintf(cext, "%s", ext.c_str());
+    int cext_len = ext.size() + 2;
+    char cext[cext_len];
+    snprintf(cext, cext_len, "%s", ext.c_str());
     if (cext[0] != '.') {
       // the file extension doesn't begin with '.', so add '.' to the extension
-      sprintf(cext, ".%s", ext.c_str());
+      snprintf(cext, cext_len, ".%s", ext.c_str());
     }
     int len = strlen(cext);
     if ((size_t) len < name.size()) {
@@ -560,14 +561,16 @@ fprintf(stdout, "%s: %4d: DPvzFile: entering, g_sz=%ld, majik='%s'\n", name_only
 	file_name = name;
       } else {
 	// the name does not end with .ext, so append the extension
-	char buf[name.size() + len + 2];
-	sprintf(buf, "%s%s", name.c_str(), cext);
+	int buf_len = name.size() + len + 2;
+	char buf[buf_len];
+	snprintf(buf, buf_len, "%s%s", name.c_str(), cext);
 	file_name = std::string(buf);
       }
     } else {
       // the name is shorter than the file extension, so append the extension
-      char buf[name.size() + len + 2];
-      sprintf(buf, "%s%s", name.c_str(), cext);
+      int buf_len = name.size() + len + 2;
+      char buf[buf_len];
+      snprintf(buf, buf_len, "%s%s", name.c_str(), cext);
       file_name = std::string(buf);
     }
   } else {
@@ -853,7 +856,7 @@ bool    DPvzFile::set_global_data(void* data, ssize_t size, off_t offset, int ro
 /****************************************************************************/
 {
 #if defined(DPvzTrace)
-fprintf(stdout, "%s: %4d: set_global_data: entering data=%p size=%ld offset=%ld\n", name_only(__FILE__), __LINE__, data, size, offset);
+fprintf(stdout, "%s: %4d: set_global_data: entering data=%p size=%lld offset=%lld\n", name_only(__FILE__), __LINE__, data, size, offset);
 #endif
 
   // is there an error in the calling parameters?
@@ -863,11 +866,11 @@ fprintf(stdout, "%s: %4d: set_global_data: entering data=%p size=%ld offset=%ld\
     set_err(DPvzSoft, check1);
   } else if (offset < 0 || (int64_t) metadata->global_only < (int64_t) offset) {
     // the offset is completely outside of the allocated global data area
-    fprintf(stderr, "%s: %4d: set_global_data: the offset (%ld) is outside of the range 0 <= offset < %ld, file '%s'\n", name_only(__FILE__), __LINE__, offset, metadata->global_only, file_name.c_str());
+    fprintf(stderr, "%s: %4d: set_global_data: the offset (%lld) is outside of the range 0 <= offset < %lld, file '%s'\n", name_only(__FILE__), __LINE__, offset, metadata->global_only, file_name.c_str());
     set_err(DPvzSoft, check1);
   } else if ((ssize_t) metadata->global_only < (size+offset)) {
     // the data would write outside of the assigned global data area
-    fprintf(stderr, "%s: %4d: set_global_data: global size (%ld) is less than size (%ld) + offset (%ld), file '%s'\n", name_only(__FILE__), __LINE__, metadata->global_only, size, offset, file_name.c_str());
+    fprintf(stderr, "%s: %4d: set_global_data: global size (%lld) is less than size (%lld) + offset (%ld), file '%s'\n", name_only(__FILE__), __LINE__, metadata->global_only, size, offset, file_name.c_str());
     set_err(DPvzSoft, check1);
   } else if (mode != DPvzReadWrite && mode != DPvzCreate) {
     fprintf(stderr, "%s: %4d: set_global_data: file mode (0x%x) is not set to ReadWrite or Create, file '%s'\n", name_only(__FILE__), __LINE__, mode, file_name.c_str());
@@ -958,7 +961,7 @@ bool    DPvzFile::set_global_data(void* data, ssize_t size, off_t offset)
 /****************************************************************************/
 {
 #if defined(DPvzTrace)
-fprintf(stdout, "%s: %4d: set_global_data: entering data=%p size=%ld offset=%ld\n", name_only(__FILE__), __LINE__, data, size, offset);
+fprintf(stdout, "%s: %4d: set_global_data: entering data=%p size=%lld offset=%lld\n", name_only(__FILE__), __LINE__, data, size, offset);
 #endif
   reset_err();
 
@@ -968,7 +971,7 @@ fprintf(stdout, "%s: %4d: set_global_data: entering data=%p size=%ld offset=%ld\
     set_err(DPvzSoft, exit);
   } else if ((ssize_t) metadata->global_only < (size+offset)) {
     // data is larger than the available space to store it
-    fprintf(stderr, "%s: %4d: set_global_data: global size (%ld) is less than size (%ld) + offset (%ld), file '%s'\n", name_only(__FILE__), __LINE__, metadata->global_only, size, offset, file_name.c_str());
+    fprintf(stderr, "%s: %4d: set_global_data: global size (%lld) is less than size (%zd) + offset (%lld), file '%s'\n", name_only(__FILE__), __LINE__, metadata->global_only, size, offset, file_name.c_str());
     set_err(DPvzSoft, exit);
   } else if (mode != DPvzReadWrite && mode != DPvzCreate) {
     // file mode doesn't allow changes
@@ -1051,13 +1054,13 @@ fprintf(stdout, "%s: %4d: fprint: rank=%d: entering\n", name_only(__FILE__), __L
 
       fprintf(fp, "    time step:       %d\n", step);
       for (int rank=0; rank < ranks; rank++) {
-	fprintf(fp, "    %d: [%ld, %ld, 0x%016lx, %ld/0x%lx]\n", rank, step_toc[rank].inflated_size, step_toc[rank].deflated_size, step_toc[rank].deflated_crc, step_toc[rank].offset, step_toc[rank].offset);
+	fprintf(fp, "    %d: [%lld, %lld, 0x%016llx, %lld/0x%llx]\n", rank, step_toc[rank].inflated_size, step_toc[rank].deflated_size, step_toc[rank].deflated_crc, step_toc[rank].offset, step_toc[rank].offset);
       }
 
       fprintf(fp, "\n");
 
       for (int rank=0; rank < ranks; rank++) {
-	fprintf(fp, "    %d: [%ld, %ld, 0x%016lx, %ld/0x%lx]\n", rank, step_toc[rank].inflated_size, step_toc[rank].deflated_size, step_toc[rank].deflated_crc, step_toc[rank].offset, step_toc[rank].offset);
+	fprintf(fp, "    %d: [%lld, %lld, 0x%016llx, %lld/0x%llx]\n", rank, step_toc[rank].inflated_size, step_toc[rank].deflated_size, step_toc[rank].deflated_crc, step_toc[rank].offset, step_toc[rank].offset);
 
 	char* data = new char[step_toc[rank].inflated_size];
 
@@ -1169,7 +1172,7 @@ bool DPvzFile::get_map(DPvzTocEntry* map)
       uint64_t L0_crc64 = crc64(mem_L0, sizeof mem_L0);
       if (toc->L1[mem_L1_idx].toc_crc != L0_crc64) {
 	// the CRCs don't match, the file has become corrupted
-	fprintf(stderr, "%s: %4d: get_map: CRCs don't match, 0x%lx != 0x%lx, file='%s'\n", name_only(__FILE__), __LINE__, toc->L1[mem_L1_idx].toc_crc, L0_crc64, file_name.c_str());
+	fprintf(stderr, "%s: %4d: get_map: CRCs don't match, 0x%llx != 0x%llx, file='%s'\n", name_only(__FILE__), __LINE__, toc->L1[mem_L1_idx].toc_crc, L0_crc64, file_name.c_str());
 	set_err(DPvzHard, exit);
       }
 
@@ -1199,7 +1202,7 @@ bool DPvzFile::get_map(DPvzTocEntry* map)
 	uint64_t L1_crc64 = crc64(mem_L1, sizeof mem_L1);
 	if (toc->L2[mem_L2_idx].toc_crc != L1_crc64) {
 	  // the CRCs don't match, the file has become corrupted
-	  fprintf(stderr, "%s: %4d: get_map: CRCs don't match, 0x%lx != 0x%lx, file='%s'\n", name_only(__FILE__), __LINE__, toc->L2[mem_L2_idx].toc_crc, L1_crc64, file_name.c_str());
+	  fprintf(stderr, "%s: %4d: get_map: CRCs don't match, 0x%llx != 0x%llx, file='%s'\n", name_only(__FILE__), __LINE__, toc->L2[mem_L2_idx].toc_crc, L1_crc64, file_name.c_str());
 	  set_err(DPvzHard, exit);
 	}
       }
@@ -1227,7 +1230,7 @@ bool DPvzFile::get_map(DPvzTocEntry* map)
 	uint64_t L0_crc64 = crc64(mem_L0, sizeof mem_L0);
 	if (mem_L1[mem_L1_idx].toc_crc != L0_crc64) {
 	  // the CRCs don't match, the file has become corrupted
-	  fprintf(stderr, "%s: %4d: get_map: CRCs don't match, 0x%lx != 0x%lx, file='%s'\n", name_only(__FILE__), __LINE__, mem_L1[mem_L1_idx].toc_crc, L0_crc64, file_name.c_str());
+	  fprintf(stderr, "%s: %4d: get_map: CRCs don't match, 0x%llx != 0x%llx, file='%s'\n", name_only(__FILE__), __LINE__, mem_L1[mem_L1_idx].toc_crc, L0_crc64, file_name.c_str());
 	  set_err(DPvzHard, exit);
 	}
       }
@@ -1337,7 +1340,7 @@ bool DPvzFile::get_step_toc(DPvzTocEntry& step, DPvzRankToc* step_toc)
   // check the table of contents crc value
   step_toc_crc = crc64(step_toc, step_toc_size);
   if (step_toc_crc != step.toc_crc) {
-    fprintf(stderr, "%s: %4d: get_step_toc: crc doesn't match, 0x%016lx != 0x%016lx, file='%s'\n", name_only(__FILE__), __LINE__, step_toc_crc, step.toc_crc, file_name.c_str());
+    fprintf(stderr, "%s: %4d: get_step_toc: crc doesn't match, 0x%016llx != 0x%016llx, file='%s'\n", name_only(__FILE__), __LINE__, step_toc_crc, step.toc_crc, file_name.c_str());
     set_err(DPvzHard, exit);
   }
 
@@ -1395,7 +1398,7 @@ bool DPvzFile::get_data (DPvzRankToc& step_rank, void* inflated_data)
   // check the crc on the deflated data
   deflated_crc = crc64(deflated_data, step_rank.deflated_size);
   if (deflated_crc != step_rank.deflated_crc) {
-    fprintf(stderr, "%s: %4d: get_data: crc doesn't match, 0x%016lx != 0x%016lx, file='%s'\n", name_only(__FILE__), __LINE__, deflated_crc, step_rank.deflated_crc, file_name.c_str());
+    fprintf(stderr, "%s: %4d: get_data: crc doesn't match, 0x%016llx != 0x%016llx, file='%s'\n", name_only(__FILE__), __LINE__, deflated_crc, step_rank.deflated_crc, file_name.c_str());
     set_err(DPvzHard, exit);
   }
 
@@ -1403,7 +1406,7 @@ bool DPvzFile::get_data (DPvzRankToc& step_rank, void* inflated_data)
   memset(inflated_data, '\0', step_rank.inflated_size);
   inflated_size = inflate_buf(inflated_data, step_rank.inflated_size, deflated_data, step_rank.deflated_size);
   if (inflated_size != step_rank.inflated_size) {
-    fprintf(stderr, "%s: %4d: get_data: inflated size (%ld) doesn't match expected size (%ld), file='%s'\n", name_only(__FILE__), __LINE__, inflated_size, step_rank.inflated_size, file_name.c_str());
+    fprintf(stderr, "%s: %4d: get_data: inflated size (%lld) doesn't match expected size (%lld), file='%s'\n", name_only(__FILE__), __LINE__, inflated_size, step_rank.inflated_size, file_name.c_str());
     set_err(DPvzHard, exit);
   }
 
@@ -2040,7 +2043,7 @@ check1:
     }
   } else {
     // for some reason have a bad table index...
-    fprintf(stderr, "%s: %4d: write: bad table index (%d), active entries=%ld, file='%s'\n", name_only(__FILE__), __LINE__, toc_idx.table, metadata->active_entries, file_name.c_str());
+    fprintf(stderr, "%s: %4d: write: bad table index (%d), active entries=%lld, file='%s'\n", name_only(__FILE__), __LINE__, toc_idx.table, metadata->active_entries, file_name.c_str());
     set_err(DPvzHard, exit);
   }
 
@@ -2255,7 +2258,7 @@ bool DPvzFile::truncate(int64_t idx)
 
   if (!failed() && (idx < 0 || metadata->active_entries <= idx)) {
     // attempting to truncate a record that is not in the file
-    fprintf(stderr, "%s: %4d: truncate: index (%ld) is out of range, file='%s'\n", name_only(__FILE__), __LINE__, idx, file_name.c_str());
+    fprintf(stderr, "%s: %4d: truncate: index (%lld) is out of range, file='%s'\n", name_only(__FILE__), __LINE__, idx, file_name.c_str());
     set_err(DPvzSoft, check1);
   }
 
@@ -2714,7 +2717,7 @@ bool DPvzFile::validate(uint64_t g_sz, std::string majik, bool repair, int root)
   // validate file length
   off_t eof = lseek(fd, 0L, SEEK_END);
   if (eof != (off_t) metadata->total_file_size) {
-    fprintf(stderr, "%s: %4d: validate: recorded file length (%ld) doesn't match actual length (%ld), file '%s'\n", name_only(__FILE__), __LINE__, metadata->total_file_size, eof, file_name.c_str());
+    fprintf(stderr, "%s: %4d: validate: recorded file length (%lld) doesn't match actual length (%lld), file '%s'\n", name_only(__FILE__), __LINE__, metadata->total_file_size, eof, file_name.c_str());
     rv = true;
   }
 
@@ -2724,27 +2727,27 @@ bool DPvzFile::validate(uint64_t g_sz, std::string majik, bool repair, int root)
   uint64_t new_metadata_checksum = crc64(metadata, metadata->metadata_only);
   metadata->metadata_checksum = tmp_metadata_checksum;
   if (new_metadata_checksum != metadata->metadata_checksum) {
-    fprintf(stderr, "%s: %4d: validate: recorded metadata checksum (%lx) doesn't match actual checksum (%lx), file '%s'\n", name_only(__FILE__), __LINE__, metadata->metadata_checksum, new_metadata_checksum, file_name.c_str());
+    fprintf(stderr, "%s: %4d: validate: recorded metadata checksum (%llx) doesn't match actual checksum (%llx), file '%s'\n", name_only(__FILE__), __LINE__, metadata->metadata_checksum, new_metadata_checksum, file_name.c_str());
     rv = true;
   }
 
   // validate global data checksum
   uint64_t new_global_checksum = crc64(global->data, metadata->global_only);
   if (new_global_checksum != metadata->global_checksum) {
-    fprintf(stderr, "%s: %4d: validate: recorded global checksum (%lx) doesn't match actual checksum (%lx), file '%s'\n", name_only(__FILE__), __LINE__, metadata->global_checksum, new_global_checksum, file_name.c_str());
+    fprintf(stderr, "%s: %4d: validate: recorded global checksum (%llx) doesn't match actual checksum (%llx), file '%s'\n", name_only(__FILE__), __LINE__, metadata->global_checksum, new_global_checksum, file_name.c_str());
     rv = true;
   }
 
   // validate table of contents checksum
   uint64_t new_toc_checksum = crc64(toc, metadata->toc_only);
   if (new_toc_checksum != metadata->toc_checksum) {
-    fprintf(stderr, "%s: %4d: validate: recorded table of contents checksum (%lx) doesn't match actual checksum (%lx), file '%s'\n", name_only(__FILE__), __LINE__, metadata->toc_checksum, new_toc_checksum, file_name.c_str());
+    fprintf(stderr, "%s: %4d: validate: recorded table of contents checksum (%llx) doesn't match actual checksum (%llx), file '%s'\n", name_only(__FILE__), __LINE__, metadata->toc_checksum, new_toc_checksum, file_name.c_str());
     rv = true;
   }
 
   // validate global data length
   if (g_sz != metadata->global_only) {
-    fprintf(stderr, "%s: %4d: validate: recorded global size (%ld) doesn't match expected size (%ld), file '%s'\n", name_only(__FILE__), __LINE__, metadata->global_only, g_sz, file_name.c_str());
+    fprintf(stderr, "%s: %4d: validate: recorded global size (%lld) doesn't match expected size (%lld), file '%s'\n", name_only(__FILE__), __LINE__, metadata->global_only, g_sz, file_name.c_str());
     rv = true;
   }
 
