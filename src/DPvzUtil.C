@@ -165,7 +165,7 @@ void fdump(FILE* fp, std::string file_name)
   read(fd, buf, size);
   close(fd);
 
-  fprintf(fp, "*** FILE %s *** (%ld)\n", file_name.c_str(), size);
+  fprintf(fp, "*** FILE %s *** (%lld)\n", file_name.c_str(), size);
 
   fdump(fp, buf, size);
 
@@ -548,11 +548,11 @@ int set_dir_lfs_stripe_size(const char* dir_name, int64_t stripe_size, int32_t s
       if (0 <= dup2(lfs_in_fd[0], 0) && 0 <= dup2(lfs_ou_fd[1], 1) && 0 <= dup2(lfs_ou_fd[1], 2)) {
 	// the pipes were successfully duplicated to stdin, stdout, and stderr, so exec the lfs command
 	char count[32];
-	sprintf(count, "%d", stripe_count);
+	snprintf(count, sizeof count, "%d", stripe_count);
 	char index[32];
-	sprintf(index, "%d", stripe_index);
+	snprintf(index, sizeof index, "%d", stripe_index);
 	char size[32];
-	sprintf(size, "%ld", stripe_size);
+	snprintf(size, sizeof size, "%lld", stripe_size);
 	const char* const lfs_arg[] = { lfs_exe, "setstripe", "--stripe_count", count, "--stripe_index", index, "--stripe_size", size, dir_name, NULL, };
 	execve(lfs_exe, (char* const*) lfs_arg, environ);
 
@@ -659,11 +659,11 @@ bool set_file_lfs_stripe_size(const char* file_name, int64_t stripe_size, int32_
       if (0 <= dup2(lfs_in_fd[0], 0) && 0 <= dup2(lfs_ou_fd[1], 1) && 0 <= dup2(lfs_ou_fd[1], 2)) {
 	// the pipes were successfully duplicated to stdin, stdout, and stderr, so exec the lfs command
 	char count[32];
-	sprintf(count, "%d", stripe_count);
+	snprintf(count, sizeof count, "%d", stripe_count);
 	char index[32];
-	sprintf(index, "%d", stripe_index);
+	snprintf(index, sizeof index, "%d", stripe_index);
 	char size[32];
-	sprintf(size, "%ld", stripe_size);
+	snprintf(size, sizeof size, "%lld", stripe_size);
 	const char* const lfs_arg[] = { lfs_exe, "setstripe", "--stripe_count", count, "--stripe_index", index, "--stripe_size", size, file_name, NULL, };
 	execve(lfs_exe, (char* const*) lfs_arg, environ);
 
@@ -787,8 +787,9 @@ char* find_exe_in_dir(const char* exe, char* dir)
       while (ent != NULL) {
 	if (strcmp(exe, ent->d_name) == 0) {
 	  // we found the executable, save and return the full path
-	  char buf[strlen(dir) + strlen(exe) + 2];
-	  sprintf(buf, "%s/%s", dir, exe);
+	  int buf_len = strlen(dir) + strlen(exe) + 2;
+	  char buf[buf_len];
+	  snprintf(buf, buf_len, "%s/%s", dir, exe);
 	  result = strdup(buf);
 	  break;
 	}

@@ -174,7 +174,7 @@ fprintf(stdout, "%-16s: %4d: read: read fd=%d data=%p meta->global_only=%ld, fil
 fprintf(stdout, "%-16s: %4d: read: crc64 meta=%lx data=%lx, file='%s'\n", name_only(__FILE__), __LINE__, meta_global_checksum, data_global_checksum, file_name.c_str());
 #endif
   if (meta_global_checksum != 0 && meta_global_checksum != data_global_checksum) {
-    fprintf(stderr, "%s: %4d: read: global checksums don't match meta=%lx != file=%lx, file='%s'\n", name_only(__FILE__), __LINE__, meta_global_checksum, data_global_checksum, file_name.c_str());
+    fprintf(stderr, "%s: %4d: read: global checksums don't match meta=%llx != file=%llx, file='%s'\n", name_only(__FILE__), __LINE__, meta_global_checksum, data_global_checksum, file_name.c_str());
     return true;
   }
 

@@ -41,7 +41,9 @@
 #include <dirent.h>
 #include <float.h>
 #include <limits.h>
+#if defined(DPVZ_MPI)
 #include <mpi.h>
+#endif
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
