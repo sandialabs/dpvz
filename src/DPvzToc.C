@@ -296,17 +296,17 @@ void DPvzToc::fprint(FILE* fp, int fd, DPvzMetadata* meta)
   DPvzTocEntry disk_L0[table_len];
   DPvzTocEntry disk_L1[table_len];
 
-  fprintf(fp, "DPvzToc (%ld)\n", meta->active_entries);
+  fprintf(fp, "DPvzToc (%lld)\n", meta->active_entries);
 
   for (int64_t i=L0_min; i <= min(((int64_t)meta->active_entries-1), L0_max); i++) {
     DPvzTocIndex idx = get_idx(i);
-    fprintf(fp, "  [%4ld]: L%d[%4d]={%d,%d,%f,%016lx,%ld/0x%lx}\n", i, idx.table, idx.l0_idx, L0[idx.l0_idx].ranks, L0[idx.l0_idx].cycle, L0[idx.l0_idx].time, L0[idx.l0_idx].toc_crc, L0[idx.l0_idx].offset, L0[idx.l0_idx].offset);
+    fprintf(fp, "  [%4lld]: L%d[%4d]={%d,%d,%f,%016llx,%lld/0x%llx}\n", i, idx.table, idx.l0_idx, L0[idx.l0_idx].ranks, L0[idx.l0_idx].cycle, L0[idx.l0_idx].time, L0[idx.l0_idx].toc_crc, L0[idx.l0_idx].offset, L0[idx.l0_idx].offset);
   }
 
   for (int64_t i=L1_min; i <= min(((int64_t)meta->active_entries-1), L1_max); i++) {
     DPvzTocIndex idx = get_idx(i);
     if (idx.l0_idx == 0) {
-      fprintf(fp, "  [%4ld]: L%d[%4d]={%d,%d,%f,%016lx,%ld/0x%lx}\n", i, idx.table, idx.l1_idx, L1[idx.l1_idx].ranks, L1[idx.l1_idx].cycle, L1[idx.l1_idx].time, L1[idx.l1_idx].toc_crc, L1[idx.l1_idx].offset, L1[idx.l1_idx].offset);
+      fprintf(fp, "  [%4lld]: L%d[%4d]={%d,%d,%f,%016llx,%lld/0x%llx}\n", i, idx.table, idx.l1_idx, L1[idx.l1_idx].ranks, L1[idx.l1_idx].cycle, L1[idx.l1_idx].time, L1[idx.l1_idx].toc_crc, L1[idx.l1_idx].offset, L1[idx.l1_idx].offset);
       if (lseek(fd, L1[idx.l1_idx].offset, SEEK_SET) < 0) {
 	fprintf(stderr, "%s: %4d: fprint: unable to seek fd=%d\n", name_only(__FILE__), __LINE__, fd);
 	perror("lseek");
@@ -319,14 +319,14 @@ void DPvzToc::fprint(FILE* fp, int fd, DPvzMetadata* meta)
       }
     }
 
-    fprintf(fp, "    [%4ld]: L%d[%4d,%4d]={%d,%d,%f,%016lx,%ld}\n", i, idx.table, idx.l1_idx, idx.l0_idx, disk_L0[idx.l0_idx].ranks, disk_L0[idx.l0_idx].cycle, disk_L0[idx.l0_idx].time, disk_L0[idx.l0_idx].toc_crc, disk_L0[idx.l0_idx].offset);
+    fprintf(fp, "    [%4lld]: L%d[%4d,%4d]={%d,%d,%f,%016llx,%lld}\n", i, idx.table, idx.l1_idx, idx.l0_idx, disk_L0[idx.l0_idx].ranks, disk_L0[idx.l0_idx].cycle, disk_L0[idx.l0_idx].time, disk_L0[idx.l0_idx].toc_crc, disk_L0[idx.l0_idx].offset);
   }
 
   for (int64_t i=L2_min; i <= min(((int64_t)meta->active_entries-1), L2_max); i++) {
     DPvzTocIndex idx = get_idx(i);
     if (idx.l0_idx == 0) {
       if (idx.l1_idx == 0) {
-	fprintf(fp, "  [%4ld]: L%d[%4d]={%d,%d,%f,%lx,%ld}\n", i, idx.table, idx.l2_idx, L2[idx.l2_idx].ranks, L2[idx.l2_idx].cycle, L2[idx.l2_idx].time, L2[idx.l2_idx].toc_crc, L2[idx.l2_idx].offset);
+	fprintf(fp, "  [%4lld]: L%d[%4d]={%d,%d,%f,%llx,%lld}\n", i, idx.table, idx.l2_idx, L2[idx.l2_idx].ranks, L2[idx.l2_idx].cycle, L2[idx.l2_idx].time, L2[idx.l2_idx].toc_crc, L2[idx.l2_idx].offset);
 	if (lseek(fd, L2[idx.l2_idx].offset, SEEK_SET) < 0) {
 	  fprintf(stderr, "%s: %4d: fprint: unable to seek fd=%d\n", name_only(__FILE__), __LINE__, fd);
 	  perror("lseek");
@@ -339,7 +339,7 @@ void DPvzToc::fprint(FILE* fp, int fd, DPvzMetadata* meta)
 	}
       }
 
-      fprintf(fp, "    [%4ld]: L%d[%4d,%4d]={%d,%d,%f,%lx,%ld}\n", i, idx.table, idx.l2_idx, idx.l1_idx, disk_L1[idx.l0_idx].ranks, disk_L1[idx.l0_idx].cycle, disk_L1[idx.l0_idx].time, disk_L1[idx.l0_idx].toc_crc, disk_L1[idx.l0_idx].offset);
+      fprintf(fp, "    [%4lld]: L%d[%4d,%4d]={%d,%d,%f,%llx,%lld}\n", i, idx.table, idx.l2_idx, idx.l1_idx, disk_L1[idx.l0_idx].ranks, disk_L1[idx.l0_idx].cycle, disk_L1[idx.l0_idx].time, disk_L1[idx.l0_idx].toc_crc, disk_L1[idx.l0_idx].offset);
       if (lseek(fd, disk_L1[idx.l1_idx].offset, SEEK_SET) < 0) {
 	fprintf(stderr, "%s: %4d: fprint: unable to read fd=%d\n", name_only(__FILE__), __LINE__, fd);
 	perror("read");
@@ -352,6 +352,6 @@ void DPvzToc::fprint(FILE* fp, int fd, DPvzMetadata* meta)
       }
     }
 
-    fprintf(fp, "      [%4ld]: L%d[%4d,%4d,%4d]={%d,%d,%f,%lx,%ld}\n", i, idx.table, idx.l2_idx, idx.l1_idx, idx.l0_idx, disk_L0[idx.l0_idx].ranks, disk_L0[idx.l0_idx].cycle, disk_L0[idx.l0_idx].time, disk_L0[idx.l0_idx].toc_crc, disk_L0[idx.l0_idx].offset);
+    fprintf(fp, "      [%4lld]: L%d[%4d,%4d,%4d]={%d,%d,%f,%llx,%lld}\n", i, idx.table, idx.l2_idx, idx.l1_idx, idx.l0_idx, disk_L0[idx.l0_idx].ranks, disk_L0[idx.l0_idx].cycle, disk_L0[idx.l0_idx].time, disk_L0[idx.l0_idx].toc_crc, disk_L0[idx.l0_idx].offset);
   }
 }

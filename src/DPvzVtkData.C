@@ -76,6 +76,30 @@ DPvzVtkData::~DPvzVtkData()
 
 /******************************************************************************/
 /*                                                                            */
+/* memrchar                                                                   */
+/*                                                                            */
+/* return a pointer to the right-most occurence of the character c, or NULL   */
+/* if there isn't one.                                                        */
+/*                                                                            */
+/* this function compensates for the fact that some compilers do not provide  */
+/* the GNU function memrchr.                                                  */
+/*                                                                            */
+/******************************************************************************/
+inline static const char* memrchar(const char* str, char c, int len)
+{
+  if (str != NULL && 0 < len) {
+    for (int i=len-1; 0 <= i; i--) {
+      if (str[i] == c) {
+        return str+i;
+      }
+    }
+  }
+
+  return NULL;
+}
+
+/******************************************************************************/
+/*                                                                            */
 /* extract                                                                    */
 /*                                                                            */
 /* from the input buffer (data, size), create a table of files contained      */
@@ -140,7 +164,7 @@ bool DPvzVtkData::extract(
 	  memcpy(array[idx].name, name_start, name_length);
 
 	  char* file_end     = name_end;
-	  char* file_start   = (char*) memrchr((void*) name_start, '/', name_length);
+	  char* file_start   = (char*) memrchar((char*) name_start, '/', name_length);
 	  file_start = (file_start == NULL) ? name_start : file_start + 1;
 	  int   file_length  = file_end - file_start;
 	  array[idx].file = new char[file_length+1];
@@ -248,7 +272,7 @@ bool DPvzVtkData::create(DPvzVtkData* elt)
 
   int len = strlen(elt->path) + strlen(elt->file) + 1;
   char copy[len+1];
-  sprintf(copy, "%s/%s", elt->path, elt->file);
+  snprintf(copy, len+1, "%s/%s", elt->path, elt->file);
   int fd = open(copy, O_CREAT | O_RDWR, 0777); 
   if (fd < 0) {
     fprintf(stderr, "%s: %4d: unable to open file='%s'\n", __FILE__, __LINE__, copy);
@@ -352,7 +376,7 @@ bool DPvzVtkData::name_to_vtk_data(const char* name, const char* output, DPvzVtk
     int len = strlen(ptr);
     char copy[len+1];
     memcpy(copy, path, len+1);
-    char* slash = (char*) memrchr(copy, '/', len+1);
+    char* slash = (char*) memrchar(copy, '/', len+1);
     slash[0] = '\0';
     elt->path = (char*) memcpy(new char[strlen(copy)+1], copy, strlen(copy)+1);
     elt->file = (char*) memcpy(new char[strlen(slash+1)+1], slash+1, strlen(slash+1)+1);
@@ -364,7 +388,7 @@ bool DPvzVtkData::name_to_vtk_data(const char* name, const char* output, DPvzVtk
     } else {
       snprintf(copy, out_len + name_len + 8, "%s/%s", pre_out, pre_name);
     }
-    char* slash = (char*) memrchr(copy, '/', strlen(copy)+1);
+    char* slash = (char*) memrchar(copy, '/', strlen(copy)+1);
     slash[0] = '\0';
     elt->path = (char*) memcpy(new char[strlen(copy)   +1], copy,    strlen(copy)   +1);
     elt->file = (char*) memcpy(new char[strlen(slash+1)+1], slash+1, strlen(slash+1)+1);
