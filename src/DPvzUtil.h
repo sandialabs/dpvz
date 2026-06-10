@@ -44,6 +44,28 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#if defined(__clang__)
+#define D64_FORMAT	"lld"
+#define U64_FORMAT	"llu"
+#define X64_FORMAT	"llx"
+#elif defined(__INTEL_COMPILER)
+#define D64_FORMAT	"lld"
+#define U64_FORMAT	"llu"
+#define X64_FORMAT	"llx"
+#elif defined(__INTEL_LLVM_COMPILER)
+#define D64_FORMAT	"lld"
+#define U64_FORMAT	"llu"
+#define X64_FORMAT	"llx"
+#elif defined(__GNUC__) || defined(__GNUG__)
+#define D64_FORMAT	"ld"
+#define U64_FORMAT	"lu"
+#define X64_FORMAT	"lx"
+#else
+#define D64_FORMAT	"ld"
+#define U64_FORMAT	"lu"
+#define X64_FORMAT	"lx"
+#endif
+
 uint64_t    crc64(const void* data, uint64_t size);
 void        fdump(FILE* fp, std::string file_name);
 void        fdump(FILE* fp, char* buf, ssize_t size);

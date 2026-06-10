@@ -165,7 +165,7 @@ void fdump(FILE* fp, std::string file_name)
   read(fd, buf, size);
   close(fd);
 
-  fprintf(fp, "*** FILE %s *** (%lld)\n", file_name.c_str(), size);
+  fprintf(fp, "*** FILE %s *** (%" D64_FORMAT ")\n", file_name.c_str(), size);
 
   fdump(fp, buf, size);
 
@@ -552,7 +552,7 @@ int set_dir_lfs_stripe_size(const char* dir_name, int64_t stripe_size, int32_t s
 	char index[32];
 	snprintf(index, sizeof index, "%d", stripe_index);
 	char size[32];
-	snprintf(size, sizeof size, "%lld", stripe_size);
+	snprintf(size, sizeof size, "%" D64_FORMAT "", stripe_size);
 	const char* const lfs_arg[] = { lfs_exe, "setstripe", "--stripe_count", count, "--stripe_index", index, "--stripe_size", size, dir_name, NULL, };
 	execve(lfs_exe, (char* const*) lfs_arg, environ);
 
@@ -663,7 +663,7 @@ bool set_file_lfs_stripe_size(const char* file_name, int64_t stripe_size, int32_
 	char index[32];
 	snprintf(index, sizeof index, "%d", stripe_index);
 	char size[32];
-	snprintf(size, sizeof size, "%lld", stripe_size);
+	snprintf(size, sizeof size, "%" D64_FORMAT "", stripe_size);
 	const char* const lfs_arg[] = { lfs_exe, "setstripe", "--stripe_count", count, "--stripe_index", index, "--stripe_size", size, file_name, NULL, };
 	execve(lfs_exe, (char* const*) lfs_arg, environ);
 

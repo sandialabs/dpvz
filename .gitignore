@@ -36,6 +36,12 @@
 *.exe
 *.out
 *.app
+dpvtk-ar-ser
+dpvtk-ar-mpi
 
 # debug information files
 *.dwo
+
+# log files
+*.log
+*.out

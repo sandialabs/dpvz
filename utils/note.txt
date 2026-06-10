@@ -1,0 +1,7 @@
+The attached file is covered under the following approved documents:
+    SAN2013-1863 establishes the Hohler-Stilp problem as UUR.
+    SCR-3337 establishes the library implementing the DPVTK file format (and therefore the file format itself) as approved Open Source code.
+
+The attached file is a representation of the first 5 cycles of the Hohler-Stilp problem as run on two MPI ranks on one of our Sandia clusters. 
+    $ shasum -a 256 hohler-stilp-2ranks-5cycles.dpvtk 
+    fea079f24eb0f92597cff9afb70c3fe88080749f0c72c9f082a4a14432b0ddd1  hohler-stilp-2ranks-5cycles.dpvtk

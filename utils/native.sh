@@ -34,6 +34,8 @@ if [[ $LIBDIR = "" ]] ; then
 fi
 export LD_LIBRARY_PATH=$LIBDIR:$LD_LIBRARY_PATH
 
+module list
+
 
 set -x
 
@@ -41,12 +43,18 @@ CFLAGS="$CFSER"
 CC="$CCSER"
 LIB=DPvzSer
 exe=dpvtk-ar-ser
+echo $CC -v
+$CC -v
 echo $CC $CFLAGS ${SRC[*]} -I $INCDIR -o $exe -lz -L $LIBDIR -l $LIB
 $CC $CFLAGS ${SRC[*]} -I $INCDIR -o $exe -lz -L $LIBDIR -l $LIB
+ldd $exe
 
 CFLAGS="$CFMPI"
 CC="$CCMPI"
 LIB=DPvzMpi
 exe=dpvtk-ar-mpi
+echo $CC -v
+$CC -v
 echo $CC $CFLAGS ${SRC[*]} -I $INCDIR -o $exe -lz -L $LIBDIR -l $LIB
 $CC $CFLAGS ${SRC[*]} -I $INCDIR -o $exe -lz -L $LIBDIR -l $LIB
+ldd $exe

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-
-
 for i in $* ; do
     if [[ $i == *=* ]] ; then
 	name="`echo $i | sed -e 's/=.*$//'`"

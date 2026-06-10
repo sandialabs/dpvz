@@ -461,28 +461,28 @@ int DPvzVtk::show(FILE* fp, const char* file, const char* path, int64_t cycle_st
 	} else {
 
 #if defined(DPVZ_OMP)
-      omp_set_lock(&dpvz_lock);
+	  omp_set_lock(&dpvz_lock);
 #endif
-int64_t page_size = dpvz->get_page_size();
-int64_t size_on_disk = page_size * ((step_toc[rank].deflated_size + page_size - 1) / page_size);
-if (rank % 1000 == 0 || (rank+1) == map[step].ranks) {
-fprintf(fp, "cycle=%3d ",          map[step].cycle);
-fprintf(fp, "time=%.6e ",          map[step].time);
-fprintf(fp, "rank=%d/%d ",         rank, map[step].ranks);
-fprintf(fp, "inflated size=%lld ", step_toc[rank].inflated_size);
-fprintf(fp, "deflated size=%lld ", step_toc[rank].deflated_size);
-fprintf(fp, "size on disk=%lld ",  size_on_disk);
-fprintf(fp, "page size=%lld ",     page_size);
-fprintf(fp, "file=%s ",            file);
-fprintf(fp, "                      \r");
-fflush(fp);
-}
+	  int64_t page_size = dpvz->get_page_size();
+	  int64_t size_on_disk = page_size * ((step_toc[rank].deflated_size + page_size - 1) / page_size);
+	  if (rank % 1000 == 0 || (rank+1) == map[step].ranks) {
+	    fprintf(fp, "cycle=%3d ",          map[step].cycle);
+	    fprintf(fp, "time=%.6e ",          map[step].time);
+	    fprintf(fp, "rank=%d/%d ",         rank, map[step].ranks);
+	    fprintf(fp, "inflated size=%" D64_FORMAT " ", step_toc[rank].inflated_size);
+	    fprintf(fp, "deflated size=%" D64_FORMAT " ", step_toc[rank].deflated_size);
+	    fprintf(fp, "size on disk=%" D64_FORMAT " ",  size_on_disk);
+	    fprintf(fp, "page size=%" D64_FORMAT " ",     page_size);
+	    fprintf(fp, "file=%s ",            file);
+	    fprintf(fp, "                      \r");
+	    fflush(fp);
+	  }
 
-total_inflated_size += step_toc[rank].inflated_size;
-total_deflated_size += step_toc[rank].deflated_size;
-total_size_on_disk  += size_on_disk;
+	  total_inflated_size += step_toc[rank].inflated_size;
+	  total_deflated_size += step_toc[rank].deflated_size;
+	  total_size_on_disk  += size_on_disk;
 #if defined(DPVZ_OMP)
-      omp_unset_lock(&dpvz_lock);
+	  omp_unset_lock(&dpvz_lock);
 #endif
 	}
       }
@@ -514,14 +514,14 @@ total_size_on_disk  += size_on_disk;
     }
   }
 
-fprintf(fp, "total inflated size=%lld ", total_inflated_size);
-fprintf(fp, "total deflated size=%lld ", total_deflated_size);
-fprintf(fp, "total size on disk=%lld ",  total_size_on_disk);
-fprintf(fp, "page size=%lld ",           dpvz->get_page_size());
-fprintf(fp, "ranks=%d ",                 ranks);
-fprintf(fp, "time steps=%d ",            time_steps-1);		// not sure why it's time_steps-1, it just gives the right answer?
-fprintf(fp, "file=%s ",                  file);
-fprintf(fp, "                                           \n");
+  fprintf(fp, "total inflated size=%" D64_FORMAT " ", total_inflated_size);
+  fprintf(fp, "total deflated size=%" D64_FORMAT " ", total_deflated_size);
+  fprintf(fp, "total size on disk=%" D64_FORMAT " ",  total_size_on_disk);
+  fprintf(fp, "page size=%" D64_FORMAT " ",           dpvz->get_page_size());
+  fprintf(fp, "ranks=%d ",                 ranks);
+  fprintf(fp, "time steps=%d ",            time_steps-1);		// not sure why it's time_steps-1, it just gives the right answer?
+  fprintf(fp, "file=%s ",                  file);
+  fprintf(fp, "                                           \n");
 
   delete dpvz;
 
@@ -849,13 +849,13 @@ int DPvzVtk::main(int argc, char**argv)
 
     if (       (strcasecmp(argv[ac], "-cs") == 0 || strcasecmp(argv[ac], "--cycle-start")  == 0) && (ac+1) < argc) {
       cycle_start = atol(argv[++ac]);
-      if (verbose) fprintf(stdout, "%s: %4d: cycle_start=%lld\n", __FILE__, __LINE__, cycle_start);
+      if (verbose) fprintf(stdout, "%s: %4d: cycle_start=%" D64_FORMAT "\n", __FILE__, __LINE__, cycle_start);
     } else if ((strcasecmp(argv[ac], "-ce") == 0 || strcasecmp(argv[ac], "--cycle-end")    == 0) && (ac+1) < argc) {
       cycle_end = atol(argv[++ac]);
-      if (verbose) fprintf(stdout, "%s: %4d: cycle_end=%lld\n", __FILE__, __LINE__, cycle_end);
+      if (verbose) fprintf(stdout, "%s: %4d: cycle_end=%" D64_FORMAT "\n", __FILE__, __LINE__, cycle_end);
     } else if ((strcasecmp(argv[ac], "-st") == 0 || strcasecmp(argv[ac], "--cycle-stride") == 0) && (ac+1) < argc) {
       cycle_stride = atol(argv[++ac]);
-      if (verbose) fprintf(stdout, "%s: %4d: cycle_stride=%lld\n", __FILE__, __LINE__, cycle_stride);
+      if (verbose) fprintf(stdout, "%s: %4d: cycle_stride=%" D64_FORMAT "\n", __FILE__, __LINE__, cycle_stride);
     } else if ((strcasecmp(argv[ac], "-ts") == 0 || strcasecmp(argv[ac], "--time-start")   == 0) && (ac+1) < argc) {
       time_start = atof(argv[++ac]);
       if (verbose) fprintf(stdout, "%s: %4d: time_start=%f\n", __FILE__, __LINE__, time_start);
