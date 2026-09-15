@@ -12,6 +12,9 @@ enable_testing()
 # sane directory naming
 include(GNUInstallDirs)
 
+# helpers for package installation
+include(CMakePackageConfigHelpers)
+
 # create compile_commands.json
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -42,3 +45,20 @@ get_filename_component(PACK_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}"
 set(CPACK_GENERATOR TGZ)
 set(CPACK_PACKAGE_DIRECTORY ${PACK_INSTALL_DIR}/../_package)
 include(CPack)
+
+# do work to install a valid cmake package
+
+configure_package_config_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/config.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/DPVZConfig.cmake"
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/DPVZ
+)
+
+write_basic_package_version_file(
+  "${PROJECT_BINARY_DIR}/DPVZConfigVersion.cmake"
+  COMPATIBILITY AnyNewerVersion)
+
+install(FILES
+  "${PROJECT_BINARY_DIR}/DPVZConfig.cmake"
+  "${PROJECT_BINARY_DIR}/DPVZConfigVersion.cmake"
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/DPVZ)

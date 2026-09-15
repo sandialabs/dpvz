@@ -1,0 +1,14 @@
+@PACKAGE_INIT@
+
+set(DPVZ_MPI "@DPVZ_MPI@")
+set(DPVZ_MPI "@DPVZ_MPI@")
+set(DPVZ_TEST_MPI "@DPVZ_TEST_MPI@")
+set(DPVZ_TEST_SERIAL "@DPVZ_TEST_SERIAL@")
+
+if(DPVZ_MPI)
+  include("${CMAKE_CURRENT_LIST_DIR}/DPvzMpi_targets.cmake")
+endif()
+
+if(DPVZ_SERIAL)
+  include("${CMAKE_CURRENT_LIST_DIR}/DPvzSer_targets.cmake")
+endif()
