@@ -62,3 +62,5 @@ install(FILES
   "${PROJECT_BINARY_DIR}/DPVZConfig.cmake"
   "${PROJECT_BINARY_DIR}/DPVZConfigVersion.cmake"
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/DPVZ)
+
+add_subdirectory(utils)

@@ -14,7 +14,6 @@ set(dpvz_header  DPvzErr.h  DPvzFile.h  DPvzGlobal.h  DPvzMetadata.h  DPvzMode.h
 # define MPI library
 if(DPVZ_MPI)
   add_library(DPvzMpi STATIC ${dpvz_src})
-  add_library(DPvzMpi::DPvzMpi ALIAS DPvzMpi)
   set_target_properties(DPvzMpi PROPERTIES PUBLIC_HEADER "${dpvz_header}" POSITION_INDEPENDENT_CODE ON)
   target_compile_options(DPvzMpi PRIVATE -DDPVZ_MPI )
   target_link_libraries(DPvzMpi PUBLIC ZLIB::ZLIB)
@@ -30,7 +29,6 @@ endif(DPVZ_MPI)
 # define serial library
 if(DPVZ_SERIAL)
   add_library(DPvzSer STATIC ${dpvz_src})
-  add_library(DPvzSer::DPvzSer ALIAS DPvzSer)
   set_target_properties(DPvzSer PROPERTIES PUBLIC_HEADER "${dpvz_header}" POSITION_INDEPENDENT_CODE ON)
   target_compile_options(DPvzSer PRIVATE -DDPVZ_SERIAL )
   target_link_libraries(DPvzMpi PUBLIC ZLIB::ZLIB)
